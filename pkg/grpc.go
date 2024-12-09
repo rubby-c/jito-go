@@ -13,7 +13,7 @@ func CreateAndObserveGRPCConn(ctx context.Context, chErr chan error, target stri
 	if err != nil {
 		return nil, err
 	}
-	
+
 	go func() {
 		var retries int
 		for {
@@ -30,14 +30,14 @@ func CreateAndObserveGRPCConn(ctx context.Context, chErr chan error, target stri
 					time.Sleep(1 * time.Second)
 					continue
 				}
-				
+
 				if state == connectivity.TransientFailure || state == connectivity.Connecting || state == connectivity.Idle {
 					if retries < 5 {
 						time.Sleep(time.Duration(retries) * time.Second)
 						conn.ResetConnectBackoff()
 						retries++
 					} else {
-						conn.Close()
+						_ = conn.Close()
 						conn, err = grpc.NewClient(target, opts...)
 						if err != nil {
 							chErr <- err
@@ -51,13 +51,13 @@ func CreateAndObserveGRPCConn(ctx context.Context, chErr chan error, target stri
 					}
 					retries = 0
 				}
-				
+
 				if !conn.WaitForStateChange(ctx, state) {
 					continue
 				}
 			}
 		}
 	}()
-	
+
 	return conn, nil
 }

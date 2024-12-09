@@ -3,8 +3,8 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"github.com/gagliardetto/solana-go"
 	"github.com/gorilla/websocket"
+	"github.com/rubby-c/solana-go"
 	"math/big"
 	"time"
 )

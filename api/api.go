@@ -2,9 +2,9 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/goccy/go-json"
 	"io"
 	"log"
 	"net/http"
@@ -87,8 +87,6 @@ func (api *Client) DoYeet() (*tmp, error) {
 
 // RetrieveRecentBundles fetches a list of recent bundles from the Jito API within a specified timeframe and limit.
 func (api *Client) RetrieveRecentBundles(limit int, timeFrame Timeframe) (*RecentBundlesResponse, error) {
-	return nil, errors.New("i'm broken pls wait ser till im fixed")
-
 	params := &url.Values{
 		"limit":     {fmt.Sprint(limit)},
 		"sort":      {"Time"},

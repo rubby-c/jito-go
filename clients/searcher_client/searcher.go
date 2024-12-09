@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gagliardetto/solana-go"
-	"github.com/gagliardetto/solana-go/programs/system"
-	"github.com/gagliardetto/solana-go/rpc"
+	"github.com/goccy/go-json"
+	"github.com/rubby-c/solana-go"
+	"github.com/rubby-c/solana-go/programs/system"
+	"github.com/rubby-c/solana-go/rpc"
 	"github.com/weeaa/jito-go/pb"
 	"github.com/weeaa/jito-go/pkg"
 	"google.golang.org/grpc"
@@ -120,125 +120,6 @@ func (c *Client) Close() error {
 	return c.GrpcConn.Close()
 }
 
-/*
-// NewMempoolStreamAccount creates a new mempool subscription on specific Solana accounts.
-func (c *Client) NewMempoolStreamAccount(accounts, regions []string) (jito_pb.SearcherService_SubscribeMempoolClient, error) {
-	return c.SearcherService.SubscribeMempool(c.Auth.GrpcCtx, &jito_pb.MempoolSubscription{
-		Msg: &jito_pb.MempoolSubscription_WlaV0Sub{
-			WlaV0Sub: &jito_pb.WriteLockedAccountSubscriptionV0{
-				Accounts: accounts,
-			},
-		},
-		Regions: regions,
-	})
-}
-*/
-
-/*
-// NewMempoolStreamProgram creates a new mempool subscription on specific Solana programs.
-func (c *Client) NewMempoolStreamProgram(programs, regions []string) (jito_pb.SearcherService_SubscribeMempoolClient, error) {
-	return c.SearcherService.SubscribeMempool(c.Auth.GrpcCtx, &jito_pb.MempoolSubscription{
-		Msg: &jito_pb.MempoolSubscription_ProgramV0Sub{
-			ProgramV0Sub: &jito_pb.ProgramSubscriptionV0{
-				Programs: programs,
-			},
-		},
-		Regions: regions,
-	})
-}
-*/
-
-/*
-// SubscribeAccountsMempoolTransactions subscribes to the mempool transactions of the provided accounts.
-func (c *Client) SubscribeAccountsMempoolTransactions(ctx context.Context, accounts, regions []string) (<-chan *solana.Transaction, <-chan error, error) {
-	sub, err := c.NewMempoolStreamAccount(accounts, regions)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	chTx := make(chan *solana.Transaction)
-	chErr := make(chan error)
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-c.Auth.GrpcCtx.Done():
-				return
-			default:
-				receipt, err := sub.Recv()
-				if err != nil {
-					chErr <- fmt.Errorf("SubscribeAccountsMempoolTransactions: failed to receive mempool notification: %w", err)
-					continue
-				}
-
-				for _, transaction := range receipt.Transactions {
-					go func(transaction *jito_pb.Packet) {
-						var tx *solana.Transaction
-						tx, err = pkg.ConvertProtobufPacketToTransaction(transaction)
-						if err != nil {
-							chErr <- fmt.Errorf("SubscribeAccountsMempoolTransactions: failed to convert protobuf packet to transaction: %w", err)
-							return
-						}
-
-						chTx <- tx
-					}(transaction)
-				}
-			}
-		}
-	}()
-
-	return chTx, chErr, nil
-}
-*/
-
-/*
-// SubscribeProgramsMempoolTransactions subscribes to the mempool transactions of the provided programs.
-func (c *Client) SubscribeProgramsMempoolTransactions(ctx context.Context, programs, regions []string) (<-chan *solana.Transaction, <-chan error, error) {
-	sub, err := c.NewMempoolStreamProgram(programs, regions)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	chTx := make(chan *solana.Transaction)
-	chErr := make(chan error)
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-c.Auth.GrpcCtx.Done():
-				return
-			default:
-				var receipt *jito_pb.PendingTxNotification
-				receipt, err = sub.Recv()
-				if err != nil {
-					chErr <- fmt.Errorf("SubscribeProgramsMempoolTransactions: failed to receive mempool notification: %w", err)
-					continue
-				}
-
-				for _, transaction := range receipt.Transactions {
-					go func(transaction *jito_pb.Packet) {
-						var tx *solana.Transaction
-						tx, err = pkg.ConvertProtobufPacketToTransaction(transaction)
-						if err != nil {
-							chErr <- fmt.Errorf("SubscribeProgramsMempoolTransactions: failed to convert protobuf packet to transaction: %w", err)
-							return
-						}
-
-						chTx <- tx
-					}(transaction)
-				}
-			}
-		}
-	}()
-
-	return chTx, chErr, nil
-}
-*/
-
 func (c *Client) GetRegions(opts ...grpc.CallOption) (*jito_pb.GetRegionsResponse, error) {
 	return c.SearcherService.GetRegions(c.Auth.GrpcCtx, &jito_pb.GetRegionsRequest{}, opts...)
 }
@@ -309,114 +190,6 @@ type BroadcastBundleResponse struct {
 	Jsonrpc string `json:"jsonrpc"`
 	Result  string `json:"result"`
 	Id      int    `json:"id"`
-}
-
-// BroadcastBundle sends a bundle through Jito API.
-func BroadcastBundle(client *http.Client, transactions []string) (*BroadcastBundleResponse, error) {
-	buf := new(bytes.Buffer)
-
-	payload := map[string]any{
-		"jsonrpc": "2.0",
-		"id":      1,
-		"method":  "sendBundle",
-		"params":  [][]string{transactions},
-	}
-
-	if err := json.NewEncoder(buf).Encode(payload); err != nil {
-		return nil, err
-	}
-
-	req := &http.Request{
-		Method: http.MethodPost,
-		URL:    jitoBundleURL,
-		Body:   io.NopCloser(buf),
-		Header: DefaultHeader.Clone(),
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("BroadcastBundle error: unexpected response status %s", resp.Status)
-	}
-
-	var out BroadcastBundleResponse
-	err = json.NewDecoder(resp.Body).Decode(&out)
-	return &out, err
-}
-
-// BroadcastBundleWithConfirmation sends a bundle of transactions on chain through Jito BlockEngine and waits for its confirmation.
-func BroadcastBundleWithConfirmation(ctx context.Context, client *http.Client, rpcConn *rpc.Client, transactions []*solana.Transaction) (*BroadcastBundleResponse, error) {
-	txsBase58, err := pkg.ConvertBachTransactionsToBase58(transactions)
-	if err != nil {
-		return nil, err
-	}
-	bundle, err := BroadcastBundle(client, txsBase58)
-	if err != nil {
-		return nil, err
-	}
-
-	bundleSignatures := pkg.BatchExtractSigFromTx(transactions)
-
-	for {
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		default:
-
-			time.Sleep(5 * time.Second)
-
-			bundleStatuses, err := GetInflightBundleStatuses(client, []string{bundle.Result})
-			if err != nil {
-				return bundle, err
-			}
-
-			if err = handleBundleResult(bundleStatuses, bundle.Result); err != nil {
-				return bundle, err
-			}
-
-			var start = time.Now()
-			var statuses *rpc.GetSignatureStatusesResult
-
-			isRPCNil(rpcConn)
-
-			for {
-				statuses, err = rpcConn.GetSignatureStatuses(context.Background(), false, bundleSignatures...)
-				if err != nil {
-					return bundle, err
-				}
-
-				ready := true
-				for _, status := range statuses.Value {
-					if status == nil {
-						ready = false
-						break
-					}
-				}
-
-				if ready {
-					break
-				}
-
-				if time.Since(start) > 15*time.Second {
-					return bundle, errors.New("operation timed out after 15 seconds")
-				} else {
-					time.Sleep(1 * time.Second)
-				}
-			}
-
-			for _, status := range statuses.Value {
-				if status.ConfirmationStatus != rpc.ConfirmationStatusProcessed && status.ConfirmationStatus != rpc.ConfirmationStatusConfirmed {
-					return bundle, errors.New("searcher service did not provide bundle status in time")
-				}
-			}
-
-			return bundle, nil
-		}
-	}
 }
 
 // BroadcastBundleWithConfirmation sends a bundle of transactions on chain thru Jito BlockEngine and waits for its confirmation.

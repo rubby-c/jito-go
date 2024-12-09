@@ -2,17 +2,13 @@ package pkg
 
 import (
 	bin "github.com/gagliardetto/binary"
-	"github.com/gagliardetto/solana-go"
-	"github.com/mr-tron/base58"
+	"github.com/rubby-c/solana-go"
 	"github.com/weeaa/jito-go/pb"
 )
 
 // ConvertTransactionToProtobufPacket converts a solana-go Transaction to a pb.Packet.
 func ConvertTransactionToProtobufPacket(transaction *solana.Transaction) (jito_pb.Packet, error) {
-	data, err := transaction.MarshalBinary()
-	if err != nil {
-		return jito_pb.Packet{}, err
-	}
+	data, _ := transaction.MarshalBinary()
 
 	return jito_pb.Packet{
 		Data: data,
@@ -24,21 +20,6 @@ func ConvertTransactionToProtobufPacket(transaction *solana.Transaction) (jito_p
 			SenderStake: 0,
 		},
 	}, nil
-}
-
-// ConvertBatchTransactionToProtobufPacket converts a slice of solana-go Transaction to a slice of pb.Packet.
-func ConvertBatchTransactionToProtobufPacket(transactions []*solana.Transaction) ([]*jito_pb.Packet, error) {
-	packets := make([]*jito_pb.Packet, 0, len(transactions))
-	for _, tx := range transactions {
-		packet, err := ConvertTransactionToProtobufPacket(tx)
-		if err != nil {
-			return nil, err
-		}
-
-		packets = append(packets, &packet)
-	}
-
-	return packets, nil
 }
 
 // ConvertProtobufPacketToTransaction converts a pb.Packet to a solana-go Transaction.
@@ -65,28 +46,4 @@ func ConvertBatchProtobufPacketToTransaction(packets []*jito_pb.Packet) ([]*sola
 	}
 
 	return txs, nil
-}
-
-// ConvertBachTransactionsToBase58 converts a slice of solana.Transaction to a base58 string encoded transaction.
-func ConvertBachTransactionsToBase58(transactions []*solana.Transaction) ([]string, error) {
-	txs := make([]string, len(transactions))
-	for i, tx := range transactions {
-		// marshal transaction to Binary
-		txBytes, err := tx.MarshalBinary()
-		if err != nil {
-			return nil, err
-		}
-		// Convert transaction Base58
-		txBase58 := base58.Encode(txBytes)
-		txs[i] = txBase58
-	}
-	return txs, nil
-}
-
-func ConvertBachTransactionsToString(transactions []*solana.Transaction) []string {
-	txs := make([]string, len(transactions))
-	for _, tx := range transactions {
-		txs = append(txs, tx.String())
-	}
-	return txs
 }

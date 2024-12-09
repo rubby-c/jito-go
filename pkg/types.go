@@ -1,7 +1,7 @@
 package pkg
 
 import (
-	"github.com/gagliardetto/solana-go"
+	"github.com/rubby-c/solana-go"
 	"time"
 )
 

@@ -6,13 +6,11 @@ import (
 )
 
 var (
-	baseApi = "explorer.jito.wtf"
-
+	baseApi           = "explorer.jito.wtf"
 	recentBundlesPath = "/wtfrest/api/v1/bundles/recent"
 
 	headers = http.Header{
-		"Referer":    {"https://explorer.jito.wtf/"},
-		"User-Agent": {"jito-golang :)"},
+		"Referer": {"https://explorer.jito.wtf/"},
 	}
 )
 

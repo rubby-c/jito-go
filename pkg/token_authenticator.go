@@ -3,8 +3,8 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"github.com/gagliardetto/solana-go"
 	"github.com/mr-tron/base58"
+	"github.com/rubby-c/solana-go"
 	"github.com/weeaa/jito-go/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"

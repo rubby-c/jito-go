@@ -6,10 +6,10 @@ toolchain go1.23.2
 
 require (
 	github.com/gagliardetto/binary v0.8.0
-	github.com/gagliardetto/solana-go v1.12.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1
 	github.com/mr-tron/base58 v1.2.0
+	github.com/rubby-c/solana-go v0.0.0-20241209203643-986a3bf94e00
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/grpc v1.68.0
 	google.golang.org/protobuf v1.35.2

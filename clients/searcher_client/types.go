@@ -1,7 +1,7 @@
 package searcher_client
 
 import (
-	"github.com/gagliardetto/solana-go/rpc"
+	"github.com/rubby-c/solana-go/rpc"
 	"github.com/weeaa/jito-go/pb"
 	"github.com/weeaa/jito-go/pkg"
 	"google.golang.org/grpc"

@@ -5,7 +5,7 @@
 
 This library contains tooling to interact with **[Jito Labs](https://www.jito.wtf/)** MEV software. ⚠️ Work in progress. ⚠️
 
-We currently use [gagliardetto/solana-go](https://github.com/gagliardetto/solana-go) to interact with Solana.  PRs and contributions are welcome.
+We currently use [gagliardetto/solana-go](https://github.com/rubby-c/solana-go) to interact with Solana.  PRs and contributions are welcome.
 
 ![jitolabs](https://github.com/weeaa/jito-go/assets/108926252/5751416c-333b-412e-8f3f-f26b2839be98)
 
@@ -121,9 +121,9 @@ package main
 import (
   "context"
   "github.com/davecgh/go-spew/spew"
-  "github.com/gagliardetto/solana-go"
-  "github.com/gagliardetto/solana-go/programs/system"
-  "github.com/gagliardetto/solana-go/rpc"
+  "github.com/rubby-c/solana-go"
+  "github.com/rubby-c/solana-go/programs/system"
+  "github.com/rubby-c/solana-go/rpc"
   "github.com/joho/godotenv"
   "github.com/weeaa/jito-go"
   "github.com/weeaa/jito-go/clients/searcher_client"
@@ -233,8 +233,8 @@ package main
 
 import (
   "context"
-  "github.com/gagliardetto/solana-go"
-  "github.com/gagliardetto/solana-go/rpc"
+  "github.com/rubby-c/solana-go"
+  "github.com/rubby-c/solana-go/rpc"
   "github.com/joho/godotenv"
   "github.com/weeaa/jito-go"
   "github.com/weeaa/jito-go/clients/searcher_client"
@@ -302,8 +302,8 @@ func main() {
 package main
 
 import (
-    "github.com/gagliardetto/solana-go"
-    "github.com/gagliardetto/solana-go/rpc"
+    "github.com/rubby-c/solana-go"
+    "github.com/rubby-c/solana-go/rpc"
     "github.com/weeaa/jito-go"
     "github.com/weeaa/jito-go/clients/searcher_client"
     "log"
@@ -359,9 +359,9 @@ package main
 
 import (
   "context"
-  "github.com/gagliardetto/solana-go"
-  "github.com/gagliardetto/solana-go/programs/system"
-  "github.com/gagliardetto/solana-go/rpc"
+  "github.com/rubby-c/solana-go"
+  "github.com/rubby-c/solana-go/programs/system"
+  "github.com/rubby-c/solana-go/rpc"
   "github.com/joho/godotenv"
   "github.com/weeaa/jito-go"
   "github.com/weeaa/jito-go/clients/searcher_client"
