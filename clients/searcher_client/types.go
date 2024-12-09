@@ -1,6 +1,7 @@
 package searcher_client
 
 import (
+	jitopb "github.com/rubby-c/jito-go/pb"
 	"github.com/rubby-c/jito-go/pkg"
 	"github.com/rubby-c/solana-go/rpc"
 	"google.golang.org/grpc"

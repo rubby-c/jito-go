@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/goccy/go-json"
+	jitopb "github.com/rubby-c/jito-go/pb"
 	"github.com/rubby-c/jito-go/pkg"
 	"github.com/rubby-c/solana-go"
 	"github.com/rubby-c/solana-go/programs/system"

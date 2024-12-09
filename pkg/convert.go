@@ -2,6 +2,7 @@ package pkg
 
 import (
 	bin "github.com/gagliardetto/binary"
+	jitopb "github.com/rubby-c/jito-go/pb"
 	"github.com/rubby-c/solana-go"
 )
 
