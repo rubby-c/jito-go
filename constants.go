@@ -1,4 +1,6 @@
-package jito_go
+package jitogo
+
+import "github.com/rubby-c/solana-go"
 
 var MainnetTipPaymentProgram = solana.MustPublicKeyFromBase58("T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt")
 var MainnetTipDistributionProgram = solana.MustPublicKeyFromBase58("4R3gSG8BpU4t19KYj8CfnbtRpnT8gtk4dvTHxVRwc2r7")
