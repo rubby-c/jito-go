@@ -4,7 +4,7 @@
 // 	protoc        v3.21.12
 // source: packet.proto
 
-package jito_pb
+package jitopb
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

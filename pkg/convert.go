@@ -3,16 +3,15 @@ package pkg
 import (
 	bin "github.com/gagliardetto/binary"
 	"github.com/rubby-c/solana-go"
-	"github.com/weeaa/jito-go/pb"
 )
 
 // ConvertTransactionToProtobufPacket converts a solana-go Transaction to a pb.Packet.
-func ConvertTransactionToProtobufPacket(transaction *solana.Transaction) (jito_pb.Packet, error) {
+func ConvertTransactionToProtobufPacket(transaction *solana.Transaction) (jitopb.Packet, error) {
 	data, _ := transaction.MarshalBinary()
 
-	return jito_pb.Packet{
+	return jitopb.Packet{
 		Data: data,
-		Meta: &jito_pb.Meta{
+		Meta: &jitopb.Meta{
 			Size:        uint64(len(data)),
 			Addr:        "",
 			Port:        0,
@@ -23,7 +22,7 @@ func ConvertTransactionToProtobufPacket(transaction *solana.Transaction) (jito_p
 }
 
 // ConvertProtobufPacketToTransaction converts a pb.Packet to a solana-go Transaction.
-func ConvertProtobufPacketToTransaction(packet *jito_pb.Packet) (*solana.Transaction, error) {
+func ConvertProtobufPacketToTransaction(packet *jitopb.Packet) (*solana.Transaction, error) {
 	tx := &solana.Transaction{}
 	err := tx.UnmarshalWithDecoder(bin.NewBorshDecoder(packet.Data))
 	if err != nil {
@@ -34,7 +33,7 @@ func ConvertProtobufPacketToTransaction(packet *jito_pb.Packet) (*solana.Transac
 }
 
 // ConvertBatchProtobufPacketToTransaction converts a slice of pb.Packet to a slice of solana-go Transaction.
-func ConvertBatchProtobufPacketToTransaction(packets []*jito_pb.Packet) ([]*solana.Transaction, error) {
+func ConvertBatchProtobufPacketToTransaction(packets []*jitopb.Packet) ([]*solana.Transaction, error) {
 	txs := make([]*solana.Transaction, 0, len(packets))
 	for _, packet := range packets {
 		tx, err := ConvertProtobufPacketToTransaction(packet)

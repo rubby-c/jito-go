@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: shredstream.proto
 
-package jito_pb
+package jitopb
 
 import (
 	context "context"

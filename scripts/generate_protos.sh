@@ -4,7 +4,7 @@
 REPO_URL="https://github.com/jito-labs/mev-protos"
 REPO_DIR="mev-protos"
 OUTPUT_DIR="../pb"
-IMPORT_PATH="github.com/jito-labs/mev-protos/jito_pb"  # Adjust this to match your actual import path
+IMPORT_PATH="github.com/jito-labs/mev-protos/jitopb"  # Adjust this to match your actual import path
 
 # Fetch the repository
 echo "Cloning repository..."

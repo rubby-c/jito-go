@@ -1,9 +1,8 @@
 package searcher_client
 
 import (
+	"github.com/rubby-c/jito-go/pkg"
 	"github.com/rubby-c/solana-go/rpc"
-	"github.com/weeaa/jito-go/pb"
-	"github.com/weeaa/jito-go/pkg"
 	"google.golang.org/grpc"
 	"math/big"
 	"net/http"
@@ -26,8 +25,8 @@ type Client struct {
 	RpcConn     *rpc.Client // Utilized for executing standard Solana RPC requests.
 	JitoRpcConn *rpc.Client // Utilized for executing specific Jito RPC requests (Jito node required).
 
-	SearcherService          jito_pb.SearcherServiceClient
-	BundleStreamSubscription jito_pb.SearcherService_SubscribeBundleResultsClient // Used for receiving *jito_pb.BundleResult (bundle broadcast status info).
+	SearcherService          jitopb.SearcherServiceClient
+	BundleStreamSubscription jitopb.SearcherService_SubscribeBundleResultsClient // Used for receiving *jitopb.BundleResult (bundle broadcast status info).
 
 	Auth *pkg.AuthenticationService
 

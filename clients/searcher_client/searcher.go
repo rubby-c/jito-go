@@ -7,11 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/goccy/go-json"
+	"github.com/rubby-c/jito-go/pkg"
 	"github.com/rubby-c/solana-go"
 	"github.com/rubby-c/solana-go/programs/system"
 	"github.com/rubby-c/solana-go/rpc"
-	"github.com/weeaa/jito-go/pb"
-	"github.com/weeaa/jito-go/pkg"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"io"
@@ -45,13 +44,13 @@ func New(
 		return nil, err
 	}
 
-	searcherService := jito_pb.NewSearcherServiceClient(conn)
+	searcherService := jitopb.NewSearcherServiceClient(conn)
 	authService := pkg.NewAuthenticationService(conn, privateKey)
-	if err = authService.AuthenticateAndRefresh(jito_pb.Role_SEARCHER); err != nil {
+	if err = authService.AuthenticateAndRefresh(jitopb.Role_SEARCHER); err != nil {
 		return nil, err
 	}
 
-	subBundleRes, err := searcherService.SubscribeBundleResults(authService.GrpcCtx, &jito_pb.SubscribeBundleResultsRequest{})
+	subBundleRes, err := searcherService.SubscribeBundleResults(authService.GrpcCtx, &jitopb.SubscribeBundleResultsRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +87,8 @@ func NewNoAuth(
 		return nil, err
 	}
 
-	searcherService := jito_pb.NewSearcherServiceClient(conn)
-	subBundleRes, err := searcherService.SubscribeBundleResults(ctx, &jito_pb.SubscribeBundleResultsRequest{})
+	searcherService := jitopb.NewSearcherServiceClient(conn)
+	subBundleRes, err := searcherService.SubscribeBundleResults(ctx, &jitopb.SubscribeBundleResultsRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -120,21 +119,21 @@ func (c *Client) Close() error {
 	return c.GrpcConn.Close()
 }
 
-func (c *Client) GetRegions(opts ...grpc.CallOption) (*jito_pb.GetRegionsResponse, error) {
-	return c.SearcherService.GetRegions(c.Auth.GrpcCtx, &jito_pb.GetRegionsRequest{}, opts...)
+func (c *Client) GetRegions(opts ...grpc.CallOption) (*jitopb.GetRegionsResponse, error) {
+	return c.SearcherService.GetRegions(c.Auth.GrpcCtx, &jitopb.GetRegionsRequest{}, opts...)
 }
 
-func (c *Client) GetConnectedLeaders(opts ...grpc.CallOption) (*jito_pb.ConnectedLeadersResponse, error) {
-	return c.SearcherService.GetConnectedLeaders(c.Auth.GrpcCtx, &jito_pb.ConnectedLeadersRequest{}, opts...)
+func (c *Client) GetConnectedLeaders(opts ...grpc.CallOption) (*jitopb.ConnectedLeadersResponse, error) {
+	return c.SearcherService.GetConnectedLeaders(c.Auth.GrpcCtx, &jitopb.ConnectedLeadersRequest{}, opts...)
 }
 
-func (c *Client) GetConnectedLeadersRegioned(regions []string, opts ...grpc.CallOption) (*jito_pb.ConnectedLeadersRegionedResponse, error) {
-	return c.SearcherService.GetConnectedLeadersRegioned(c.Auth.GrpcCtx, &jito_pb.ConnectedLeadersRegionedRequest{Regions: regions}, opts...)
+func (c *Client) GetConnectedLeadersRegioned(regions []string, opts ...grpc.CallOption) (*jitopb.ConnectedLeadersRegionedResponse, error) {
+	return c.SearcherService.GetConnectedLeadersRegioned(c.Auth.GrpcCtx, &jitopb.ConnectedLeadersRegionedRequest{Regions: regions}, opts...)
 }
 
 // GetTipAccounts returns Jito Tip Accounts.
-func (c *Client) GetTipAccounts(opts ...grpc.CallOption) (*jito_pb.GetTipAccountsResponse, error) {
-	return c.SearcherService.GetTipAccounts(c.Auth.GrpcCtx, &jito_pb.GetTipAccountsRequest{}, opts...)
+func (c *Client) GetTipAccounts(opts ...grpc.CallOption) (*jitopb.GetTipAccountsResponse, error) {
+	return c.SearcherService.GetTipAccounts(c.Auth.GrpcCtx, &jitopb.GetTipAccountsRequest{}, opts...)
 }
 
 // GetRandomTipAccount returns a random Jito TipAccount.
@@ -147,28 +146,28 @@ func (c *Client) GetRandomTipAccount(opts ...grpc.CallOption) (string, error) {
 	return resp.Accounts[rand.Intn(len(resp.Accounts))], nil
 }
 
-func (c *Client) GetNextScheduledLeader(regions []string, opts ...grpc.CallOption) (*jito_pb.NextScheduledLeaderResponse, error) {
-	return c.SearcherService.GetNextScheduledLeader(c.Auth.GrpcCtx, &jito_pb.NextScheduledLeaderRequest{Regions: regions}, opts...)
+func (c *Client) GetNextScheduledLeader(regions []string, opts ...grpc.CallOption) (*jitopb.NextScheduledLeaderResponse, error) {
+	return c.SearcherService.GetNextScheduledLeader(c.Auth.GrpcCtx, &jitopb.NextScheduledLeaderRequest{Regions: regions}, opts...)
 }
 
 // NewBundleSubscriptionResults creates a new bundle subscription stream, allowing to receive information about broadcasted bundles.
-func (c *Client) NewBundleSubscriptionResults(opts ...grpc.CallOption) (jito_pb.SearcherService_SubscribeBundleResultsClient, error) {
-	return c.SearcherService.SubscribeBundleResults(c.Auth.GrpcCtx, &jito_pb.SubscribeBundleResultsRequest{}, opts...)
+func (c *Client) NewBundleSubscriptionResults(opts ...grpc.CallOption) (jitopb.SearcherService_SubscribeBundleResultsClient, error) {
+	return c.SearcherService.SubscribeBundleResults(c.Auth.GrpcCtx, &jitopb.SubscribeBundleResultsRequest{}, opts...)
 }
 
 // BroadcastBundle sends a bundle of transaction(s) on chain through Jito.
-func (c *Client) BroadcastBundle(transactions []*solana.Transaction, opts ...grpc.CallOption) (*jito_pb.SendBundleResponse, error) {
+func (c *Client) BroadcastBundle(transactions []*solana.Transaction, opts ...grpc.CallOption) (*jitopb.SendBundleResponse, error) {
 	bundle, err := c.AssembleBundle(transactions)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.SearcherService.SendBundle(c.Auth.GrpcCtx, &jito_pb.SendBundleRequest{Bundle: bundle}, opts...)
+	return c.SearcherService.SendBundle(c.Auth.GrpcCtx, &jitopb.SendBundleRequest{Bundle: bundle}, opts...)
 }
 
 // SpamBundle spams BroadcastBundle (spam being the amount of bundles sent). Beware, it uses goroutines 😉.
-func (c *Client) SpamBundle(transactions []*solana.Transaction, spam int, opts ...grpc.CallOption) ([]*jito_pb.SendBundleResponse, []error) {
-	bundles := make([]*jito_pb.SendBundleResponse, spam)
+func (c *Client) SpamBundle(transactions []*solana.Transaction, spam int, opts ...grpc.CallOption) ([]*jitopb.SendBundleResponse, []error) {
+	bundles := make([]*jitopb.SendBundleResponse, spam)
 	errs := make([]error, spam)
 	mu := sync.Mutex{}
 	for i := 0; i < spam; i++ {
@@ -193,7 +192,7 @@ type BroadcastBundleResponse struct {
 }
 
 // BroadcastBundleWithConfirmation sends a bundle of transactions on chain thru Jito BlockEngine and waits for its confirmation.
-func (c *Client) BroadcastBundleWithConfirmation(ctx context.Context, transactions []*solana.Transaction, opts ...grpc.CallOption) (*jito_pb.SendBundleResponse, error) {
+func (c *Client) BroadcastBundleWithConfirmation(ctx context.Context, transactions []*solana.Transaction, opts ...grpc.CallOption) (*jitopb.SendBundleResponse, error) {
 	bundle, err := c.BroadcastBundle(transactions, opts...)
 	if err != nil {
 		return nil, err
@@ -259,28 +258,28 @@ func (c *Client) BroadcastBundleWithConfirmation(ctx context.Context, transactio
 }
 
 // bundleID arg is solely for JSON RPC API.
-func handleBundleResult[T *GetInflightBundlesStatusesResponse | *jito_pb.BundleResult](t T, bundleID string) error {
+func handleBundleResult[T *GetInflightBundlesStatusesResponse | *jitopb.BundleResult](t T, bundleID string) error {
 	switch bundle := any(t).(type) {
-	case *jito_pb.BundleResult:
+	case *jitopb.BundleResult:
 		switch bundle.Result.(type) {
-		case *jito_pb.BundleResult_Accepted:
+		case *jitopb.BundleResult_Accepted:
 			break
-		case *jito_pb.BundleResult_Rejected:
-			rejected := bundle.Result.(*jito_pb.BundleResult_Rejected)
+		case *jitopb.BundleResult_Rejected:
+			rejected := bundle.Result.(*jitopb.BundleResult_Rejected)
 			switch rejected.Rejected.Reason.(type) {
-			case *jito_pb.Rejected_SimulationFailure:
+			case *jitopb.Rejected_SimulationFailure:
 				rejection := rejected.Rejected.GetSimulationFailure()
 				return NewSimulationFailureError(rejection.TxSignature, rejection.GetMsg())
-			case *jito_pb.Rejected_StateAuctionBidRejected:
+			case *jitopb.Rejected_StateAuctionBidRejected:
 				rejection := rejected.Rejected.GetStateAuctionBidRejected()
 				return NewStateAuctionBidRejectedError(rejection.AuctionId, rejection.SimulatedBidLamports)
-			case *jito_pb.Rejected_WinningBatchBidRejected:
+			case *jitopb.Rejected_WinningBatchBidRejected:
 				rejection := rejected.Rejected.GetWinningBatchBidRejected()
 				return NewWinningBatchBidRejectedError(rejection.AuctionId, rejection.SimulatedBidLamports)
-			case *jito_pb.Rejected_InternalError:
+			case *jitopb.Rejected_InternalError:
 				rejection := rejected.Rejected.GetInternalError()
 				return NewInternalError(rejection.Msg)
-			case *jito_pb.Rejected_DroppedBundle:
+			case *jitopb.Rejected_DroppedBundle:
 				rejection := rejected.Rejected.GetDroppedBundle()
 				return NewDroppedBundle(rejection.Msg)
 			default:
@@ -455,20 +454,20 @@ func BatchGetBundleStatuses(client *http.Client, bundleIDs ...string) ([]*Bundle
 }
 
 // AssembleBundle converts an array of SOL transactions to a Jito bundle.
-func (c *Client) AssembleBundle(transactions []*solana.Transaction) (*jito_pb.Bundle, error) {
-	packets := make([]*jito_pb.Packet, 0, len(transactions))
+func (c *Client) AssembleBundle(transactions []*solana.Transaction) (*jitopb.Bundle, error) {
+	packets := make([]*jitopb.Packet, 0, len(transactions))
 
 	// converts an array of transactions to an array of protobuf packets
 	for i, tx := range transactions {
 		packet, err := pkg.ConvertTransactionToProtobufPacket(tx)
 		if err != nil {
-			return nil, fmt.Errorf("%d: error converting tx to jito_pb packet [%w]", i, err)
+			return nil, fmt.Errorf("%d: error converting tx to jitopb packet [%w]", i, err)
 		}
 
 		packets = append(packets, &packet)
 	}
 
-	return &jito_pb.Bundle{Packets: packets, Header: nil}, nil
+	return &jitopb.Bundle{Packets: packets, Header: nil}, nil
 }
 
 // GetInflightBundleStatuses returns the status of submitted bundles within the last five minutes, allowing up to five bundle IDs per request.
